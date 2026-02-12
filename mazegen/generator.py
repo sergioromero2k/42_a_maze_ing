@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 import random
+from typing import List, Dict, Tuple, Any, Optional
 
 
 class MazeGenerator:
-    def __init__(self, width: int, height: int, seed: int) -> None:
+    def __init__(
+            self, width: int, height: int, seed: int, entry: Tuple[int, int],
+            exit: Tuple[int, int]
+            ) -> None:
         # We save the values (with their type: int)
         self.width = width
         self.height = height
@@ -18,4 +22,5 @@ class MazeGenerator:
             [15 for _ in range(width)] for _ in range(height)]
         self.visited = list[list[int]] = [
             [False for _ in range(width)] for _ in range(height)]
-        
+
+
