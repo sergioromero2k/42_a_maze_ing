@@ -1,9 +1,21 @@
+#!/usr/bin/env python3
+import random
+
+
 class MazeGenerator:
-    def __init__(self, width, height, seed):
+    def __init__(self, width: int, height: int, seed: int) -> None:
+        # We save the values (with their type: int)
         self.width = width
         self.height = height
         self.seed = seed
-    
-    def generate_matrix(self):
-        pass
-    
+
+        # We configure randomness with the seed.
+        random.seed(self.seed)
+
+        # This is where you will create the 15s matrix
+        self.grid: list[list[int]] = []
+        self.grid: list[list[int]] = [
+            [15 for _ in range(width)] for _ in range(height)]
+        self.visited = list[list[int]] = [
+            [False for _ in range(width)] for _ in range(height)]
+        
