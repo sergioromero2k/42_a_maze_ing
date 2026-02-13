@@ -52,6 +52,11 @@ Necesitarás algoritmos como **BFS** (para el camino más corto) o **A*** para r
 
 ---
 
+### Archivos adicionales
+
+- `test_suite_extra/` → Contiene archivos de teoría y ejercicios extra de datos. No son necesarios para ejecutar el proyecto.
+
+
 ## 4. Un consejo sobre la IA en 42
 El documento es muy claro: usa la IA para tareas tediosas (como generar el Makefile o estructuras repetitivas), pero nunca copies código que no entiendas. En la evaluación te pedirán modificar el código en vivo para demostrar que tú tienes el control.
 

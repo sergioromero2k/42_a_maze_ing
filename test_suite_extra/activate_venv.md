@@ -8,6 +8,9 @@ source venv/bin/activate
 pip install flake8
 flake8 --version
 
+# Install the packages from requirements.txt
+pip install -r requirements.txt
+
 # Exit
 deactivate
 ```
