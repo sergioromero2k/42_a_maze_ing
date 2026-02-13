@@ -89,8 +89,8 @@ class MazeGenerator:
         """
         Center the stencil: subtract half of the stencil size so
         its top-left corner lands correctly
-        (the stencil spans x=0..6 => width 7 -> 7//2 = 3, and
-        y=0..4 => height 5 -> 5//2 = 2)
+        (the stencil spans  x=0-6 => width 7 -> 7//2 = 3, and
+                            y=0-4 => height 5 -> 5//2 = 2)
         """
         offset_x = self.width // 2 - 3
         offset_y = self.height // 2 - 2
@@ -108,4 +108,5 @@ class MazeGenerator:
         self.exit = exit
 
         # We mark the entry as visited so that the algorithm stats there
+        #                  coordenate[0][0]
         self.visited[self.entry[0]][self.entry[1]] = True
