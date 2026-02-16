@@ -9,6 +9,7 @@ The configuration file should have key=value pairs, optionally with comments
 starting with '#' and empty lines.
 """
 
+
 class ConfigError(Exception):
     pass
 
@@ -65,14 +66,13 @@ def format_value(key: str, value: str) -> Any:
             if value.lower() == "true":
                 value = True
             else:
-                raise ValueError("PERFECT must be true")   
+                raise ValueError("PERFECT must be true")
         # Default: keep as string
         return value
     except ValueError as e:
         print(f"Error converting {key}=‘{value}’: {e}")
         # The program will end and close.
         sys.exit(1)
-        
 
 
 def format_config(raw_data: Dict[str, str]) -> Dict[str, Any]:
@@ -92,13 +92,11 @@ def validate_logic(config: Dict[str, str]) -> bool:
     # Basic sanity check: width and height must exist and not be empty/zero.
     if not (width or height):
         raise ConfigError("Config.txt is empty or fake")
-    
     # Validate that ENTRY coordinates are inside the map boundaries.
     if entry[0] < 0 or entry[0] >= height:
         raise ConfigError(f"Entry out of map: {entry} with height = {height}")
     if entry[1] < 0 or entry[1] >= width:
         raise ConfigError(f"Entry out of map: {entry} with width = {width}")
-    
     # Validate that EXIT coordinates are inside the map boundaries.
     if exit_[0] < 0 or exit_[0] >= height:
         raise ConfigError(f"Entry out of map: {exit_} with height = {height}")
@@ -106,6 +104,7 @@ def validate_logic(config: Dict[str, str]) -> bool:
         raise ConfigError(f"Entry out of map: {exit_} with width = {width}")
 
     return True
+
 
 def parse_config(file_path: str) -> Dict[str, Any]:
     # Main funciton that coordinates reading and formatting.

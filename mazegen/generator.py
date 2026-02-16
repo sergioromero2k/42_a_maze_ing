@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import random
-from typing import List, Dict, Tuple, Any, Optional
+from typing import Tuple, Optional
 
 
 class MazeGenerator:
