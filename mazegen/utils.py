@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
 from typing import Dict, Any
+import sys
 
 """
 This module provides functions to read and parse a configurate file.
 The configuration file should have key=value pairs, optionally with comments
 starting with '#' and empty lines.
 """
+
+class ConfigError(Exception):
+    pass
 
 
 def get_raw_config(file_path: str) -> Dict[str, str]:
@@ -58,13 +62,17 @@ def format_value(key: str, value: str) -> Any:
             value = (int(parts[0]), int(parts[1]))
             return value
         elif key == "PERFECT":
-            value = (value.lower() == "true")
+            if value.lower() == "true":
+                value = True
+            else:
+                raise ValueError("PERFECT must be true")   
         # Default: keep as string
         return value
     except ValueError as e:
         print(f"Error converting {key}=‘{value}’: {e}")
-        # Returns None if it can't convert
-        return None
+        # The program will end and close.
+        sys.exit(1)
+        
 
 
 def format_config(raw_data: Dict[str, str]) -> Dict[str, Any]:
@@ -74,10 +82,41 @@ def format_config(raw_data: Dict[str, str]) -> Dict[str, Any]:
     }
 
 
+def validate_logic(config: Dict[str, str]) -> bool:
+    #  Validate the main configuration: ensures WIDTH, HEIGHT, ENTRY, and EXIT
+    width = config["WIDTH"]
+    height = config["HEIGHT"]
+    entry = config["ENTRY"]
+    exit_ = config["EXIT"]
+
+    # Basic sanity check: width and height must exist and not be empty/zero.
+    if not (width or height):
+        raise ConfigError("Config.txt is empty or fake")
+    
+    # Validate that ENTRY coordinates are inside the map boundaries.
+    if entry[0] < 0 or entry[0] >= height:
+        raise ConfigError(f"Entry out of map: {entry} with height = {height}")
+    if entry[1] < 0 or entry[1] >= width:
+        raise ConfigError(f"Entry out of map: {entry} with width = {width}")
+    
+    # Validate that EXIT coordinates are inside the map boundaries.
+    if exit_[0] < 0 or exit_[0] >= height:
+        raise ConfigError(f"Entry out of map: {exit_} with height = {height}")
+    if exit_[1] < 0 or exit_[1] >= width:
+        raise ConfigError(f"Entry out of map: {exit_} with width = {width}")
+
+    return True
+
 def parse_config(file_path: str) -> Dict[str, Any]:
     # Main funciton that coordinates reading and formatting.
     raw = get_raw_config(file_path)
-    return format_config(raw)
+    raw_data = format_config(raw)
+    try:
+        validate_logic(raw_data)
+    except ConfigError as e:
+        print("Configuration error: ", e)
+        sys.exit(1)
+    return raw_data
 
 
 # if __name__ == "__main__":
