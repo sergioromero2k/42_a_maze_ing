@@ -11,6 +11,7 @@ starting with '#' and empty lines.
 
 
 class ConfigError(Exception):
+    # Custom exception for configuration errors
     pass
 
 

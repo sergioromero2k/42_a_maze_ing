@@ -111,7 +111,6 @@ class MazeGenerator:
         #                  coordenate[0][0]
         self.visited[self.entry[0]][self.entry[1]] = True
 
-
     def generate(self) -> None:
         """Generate the maze using the Recursive Backtracker (DFS) algorithm.
         The algorithm ensures that the maze is perfect (expansion tree).
@@ -126,44 +125,53 @@ class MazeGenerator:
 
             if neighbors:
                 nx, ny, direction, opp_direction = random.choice(neighbors)
-                # We remove the walls (bitwise) between the current cell and the neighboring cell.
+                # We remove the walls (bitwise) between
+                # the current cell and the neighboring cell.
                 self.grid[cy][cx] -= direction
                 self.grid[ny][nx] -= opp_direction
-                
                 self.visited[ny][nx] = True
                 stack.append((nx, ny))
             else:
                 # Backtracking step:
-                # If the current cell has no unvisited neighbors, we go back to the
-                # previous cell in the path by popping the stack.
+                # If the current cell has no unvisited neighbors,
+                # We go back to the previous cell in the path
+                # by popping the stack.
                 stack.pop()
-
         """
-        Open the maze entrance and exit to the outside by removing the wall bit(s) that touch
-        the grid border (N=1, E=2, S=4, W=8). For earch of the two cells (entry and exit), we check
-        if lies on the North/South/West/East edge and clear the corresponding wall using bit by bit AND with
+        Open the maze entrance and exit to the outside
+        by removing the wall bit(s) that touch
+        the grid border (N=1, E=2, S=4, W=8).
+
+        For earch of the two cells (entry and exit), we check
+        if lies on the North/South/West/East edge and clear the
+        corresponding wall using bit by bit AND with
         the negated mask (&=~mask).
         """
         for pos in [self.entry, self.exit]:
             # Open entrance and exit to the outside.
-            row, column = pos 
-            if row == 0: # Northern Border
+            row, column = pos
+            # Northern Border
+            if row == 0:
                 self.grid[row][column] &= ~1
-            elif row == self.height - 1: # Southern Border
+                # Southern Border
+            elif row == self.height - 1:
                 self.grid[row][column] &= ~4
-            
-            if column == 0: # West Border
+            # West Border
+            if column == 0:
                 self.grid[row][column] &= ~8
-            elif column == self.width -1: # East Edge
+            # East Edge
+            elif column == self.width - 1:
                 self.grid[row][column] &= ~2
-
 
     def _get_unvisited_neighbors(
         self, x: int, y: int, visited: List[List[bool]]
     ) -> List[Tuple[int, int, int, int]]:
-        """Searches for unvisited neighbors and returns their position and wall bits.
+        """Searches for unvisited neighbors and
+            returns their position and wall bits.
+
         Returns:
-            List[Tuple[nx, ny, dir, opp_dir]]: Current direction and its opposite.
+            List[Tuple[nx, ny, dir, opp_dir]]: Current direction
+                                                and its opposite.
         """
         neighbors = []
         # Addresses: (dx, dy, current_bit, opposite_bit)
@@ -176,7 +184,8 @@ class MazeGenerator:
 
         for dx, dy, bit, opp_bit in directions:
             nx, ny = x + dx, y + dy
-            if 0 <= nx < self.width and 0 <= ny < self.height and not visited[ny][nx]:
+            if (0 <= nx < self.width
+                    and 0 <= ny < self.height
+                    and not visited[ny][nx]):
                 neighbors.append((nx, ny, bit, opp_bit))
-        
         return neighbors
