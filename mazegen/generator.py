@@ -133,7 +133,30 @@ class MazeGenerator:
                 self.visited[ny][nx] = True
                 stack.append((nx, ny))
             else:
+                # Backtracking step:
+                # If the current cell has no unvisited neighbors, we go back to the
+                # previous cell in the path by popping the stack.
                 stack.pop()
+
+        """
+        Open the maze entrance and exit to the outside by removing the wall bit(s) that touch
+        the grid border (N=1, E=2, S=4, W=8). For earch of the two cells (entry and exit), we check
+        if lies on the North/South/West/East edge and clear the corresponding wall using bit by bit AND with
+        the negated mask (&=~mask).
+        """
+        for pos in [self.entry, self.exit]:
+            # Open entrance and exit to the outside.
+            row, column = pos 
+            if row == 0: # Northern Border
+                self.grid[row][column] &= ~1
+            elif row == self.height - 1: # Southern Border
+                self.grid[row][column] &= ~4
+            
+            if column == 0: # West Border
+                self.grid[row][column] &= ~8
+            elif column == self.width -1: # East Edge
+                self.grid[row][column] &= ~2
+
 
     def _get_unvisited_neighbors(
         self, x: int, y: int, visited: List[List[bool]]
