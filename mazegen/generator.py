@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import random
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 
 class MazeGenerator:
@@ -110,3 +110,50 @@ class MazeGenerator:
         # We mark the entry as visited so that the algorithm stats there
         #                  coordenate[0][0]
         self.visited[self.entry[0]][self.entry[1]] = True
+
+
+    def generate(self) -> None:
+        """Generate the maze using the Recursive Backtracker (DFS) algorithm.
+        The algorithm ensures that the maze is perfect (expansion tree).
+        """
+        stack: List[Tuple[int, int]] = []
+        start_cell: Tuple[int, int] = self.entry
+        stack.append(start_cell)
+
+        while stack:
+            cx, cy = stack[-1]
+            neighbors = self._get_unvisited_neighbors(cx, cy, self.visited)
+
+            if neighbors:
+                nx, ny, direction, opp_direction = random.choice(neighbors)
+                # We remove the walls (bitwise) between the current cell and the neighboring cell.
+                self.grid[cy][cx] -= direction
+                self.grid[ny][nx] -= opp_direction
+                
+                self.visited[ny][nx] = True
+                stack.append((nx, ny))
+            else:
+                stack.pop()
+
+    def _get_unvisited_neighbors(
+        self, x: int, y: int, visited: List[List[bool]]
+    ) -> List[Tuple[int, int, int, int]]:
+        """Searches for unvisited neighbors and returns their position and wall bits.
+        Returns:
+            List[Tuple[nx, ny, dir, opp_dir]]: Current direction and its opposite.
+        """
+        neighbors = []
+        # Addresses: (dx, dy, current_bit, opposite_bit)
+        directions = [
+            (0, -1, 1, 4),  # North (1)     -> Opposite South (4)
+            (1, 0, 2, 8),   # East (2)      -> Opposite West (8)
+            (0, 1, 4, 1),   # South (4)     -> Opposite North (1)
+            (-1, 0, 8, 2)   # West (8)      -> Opposite East (2)
+        ]
+
+        for dx, dy, bit, opp_bit in directions:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < self.width and 0 <= ny < self.height and not visited[ny][nx]:
+                neighbors.append((nx, ny, bit, opp_bit))
+        
+        return neighbors
