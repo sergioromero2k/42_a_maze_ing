@@ -79,30 +79,34 @@ def format_value(key: str, value: str) -> Any:
 def format_config(raw_data: Dict[str, str]) -> Dict[str, Any]:
     # Receives the string dictionary and returns the correct types.
     return {
-        key: format_value(key, value) for key, value in raw_data.items()
+        key.lower(): format_value(key, value) for key, value in raw_data.items()
     }
 
 
-def validate_logic(config: Dict[str, str]) -> bool:
-    #  Validate the main configuration: ensures WIDTH, HEIGHT, ENTRY, and EXIT
-    width = config["WIDTH"]
-    height = config["HEIGHT"]
-    entry = config["ENTRY"]
-    exit_ = config["EXIT"]
+def validate_logic(config: Dict[str, Any]) -> bool:
+    # Validate the main configuration: ensures WIDTH, HEIGHT, ENTRY, and EXIT
+    width = config["width"]
+    height = config["height"]
+    entry = config["entry"]
+    exit_ = config["exit"]
 
     # Basic sanity check: width and height must exist and not be empty/zero.
-    if not (width or height):
-        raise ConfigError("Config.txt is empty or fake")
+    if not width or not height:
+        raise ConfigError("Config.txt is missing WIDTH or HEIGHT")
+
     # Validate that ENTRY coordinates are inside the map boundaries.
-    if entry[0] < 0 or entry[0] >= height:
-        raise ConfigError(f"Entry out of map: {entry} with height = {height}")
-    if entry[1] < 0 or entry[1] >= width:
-        raise ConfigError(f"Entry out of map: {entry} with width = {width}")
+    # entry[0] is row (y), entry[1] is col (x)
+    if not (0 <= entry[0] < height):
+        raise ConfigError(f"Entry ROW out of map: {entry[0]} with height = {height}")
+    if not (0 <= entry[1] < width):
+        raise ConfigError(f"Entry COL out of map: {entry[1]} with width = {width}")
+
     # Validate that EXIT coordinates are inside the map boundaries.
-    if exit_[0] < 0 or exit_[0] >= height:
-        raise ConfigError(f"Entry out of map: {exit_} with height = {height}")
-    if exit_[1] < 0 or exit_[1] >= width:
-        raise ConfigError(f"Entry out of map: {exit_} with width = {width}")
+    # exit_[0] is row (y), exit_[1] is col (x)
+    if not (0 <= exit_[0] < height):
+        raise ConfigError(f"Exit ROW out of map: {exit_[0]} with height = {height}")
+    if not (0 <= exit_[1] < width):
+        raise ConfigError(f"Exit COL out of map: {exit_[1]} with width = {width}")
 
     return True
 

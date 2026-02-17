@@ -12,7 +12,7 @@ class MazeGenerator:
         entry: Tuple[int, int],
         exit: Tuple[int, int],
         output_file: str,
-        perfect_maze: bool
+        perfect: bool
     ) -> None:
         """
         Initializes a maze generator with the given configuration.
@@ -42,6 +42,8 @@ class MazeGenerator:
         self.seed = seed
         self.entry = entry
         self.exit = exit
+        self.output_file = output_file
+        self.perfect = perfect
 
         # We configure randomness with the seed.
         # Freeze randomness (deterministic generation)
