@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Tuple, Optional, List
+from typing import Tuple, List
 from collections import deque
 
 
