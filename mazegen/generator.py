@@ -191,3 +191,21 @@ class MazeGenerator:
                     and not visited[ny][nx]):
                 neighbors.append((nx, ny, bit, opp_bit))
         return neighbors
+
+
+def save_to_file(self):
+    # Hexadecimal reference for bitwise values (0-15)
+    hexa = "0123456789abcdef"
+    text = ""
+
+    # Iterate through the grid row by row
+    for f in range(self.height):
+        for c in range(self.width):
+            # Get cell value and convert it to its hex character
+            valor = self.grid[f][c]
+            character = hexa[valor]
+            text += character
+
+    # Write the resulting string into the output file
+    with open(self.output_file, "w") as file:
+        file.write(text)

@@ -79,7 +79,8 @@ def format_value(key: str, value: str) -> Any:
 def format_config(raw_data: Dict[str, str]) -> Dict[str, Any]:
     # Receives the string dictionary and returns the correct types.
     return {
-        key.lower(): format_value(key, value) for key, value in raw_data.items()
+        key.lower(): format_value(key, value)
+        for key, value in raw_data.items()
     }
 
 
@@ -97,16 +98,20 @@ def validate_logic(config: Dict[str, Any]) -> bool:
     # Validate that ENTRY coordinates are inside the map boundaries.
     # entry[0] is row (y), entry[1] is col (x)
     if not (0 <= entry[0] < height):
-        raise ConfigError(f"Entry ROW out of map: {entry[0]} with height = {height}")
+        raise ConfigError(
+            f"Entry ROW out of map: {entry[0]} with height = {height}")
     if not (0 <= entry[1] < width):
-        raise ConfigError(f"Entry COL out of map: {entry[1]} with width = {width}")
+        raise ConfigError(
+            f"Entry COL out of map: {entry[1]} with width = {width}")
 
     # Validate that EXIT coordinates are inside the map boundaries.
     # exit_[0] is row (y), exit_[1] is col (x)
     if not (0 <= exit_[0] < height):
-        raise ConfigError(f"Exit ROW out of map: {exit_[0]} with height = {height}")
+        raise ConfigError(
+            f"Exit ROW out of map: {exit_[0]} with height = {height}")
     if not (0 <= exit_[1] < width):
-        raise ConfigError(f"Exit COL out of map: {exit_[1]} with width = {width}")
+        raise ConfigError(
+            f"Exit COL out of map: {exit_[1]} with width = {width}")
 
     return True
 
