@@ -89,3 +89,17 @@ a_maze_ing/
 │
 └── dist/                   # Aquí se generará tu .whl o .tar.gz tras el build.
 ```
+
+Este módulo permite la creación de laberintos perfectos mediante el algoritmo **Recursive Backtracker (DFS)** 
+y su resolución óptima usando **Breadth-First Search (BFS)**.
+
+## Instalación
+
+Este módulo permite la creación de laberintos perfectos mediante el algoritmo **Recursive Backtracker (DFS)** 
+y su resolución óptima usando **Breadth-First Search (BFS)**.
+
+## Instalación
+
+Desde la carpeta raíz del proyecto, instala el paquete en modo editable:
+```bash
+pip install -e .
