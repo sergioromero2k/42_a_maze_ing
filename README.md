@@ -1,3 +1,5 @@
+*This project was created as part of the 42 curriculum by serromer, dcasado-.*
+
 ## 1. Teoría Fundamental a Estudiar
 
 Antes de tocar el teclado, necesitas comprender los conceptos matemáticos y computacionales detrás de los laberintos:
