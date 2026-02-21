@@ -9,6 +9,7 @@ __pycache__/
 venv/
 env/
 ENV/
+mlx_source/
 
 # IDE / editors
 .vscode/
@@ -53,3 +54,4 @@ generated/
 
 # Jupyter
 .ipynb_checkpoints/
+
