@@ -97,13 +97,15 @@ class MazeGenerator:
         offset_x = self.width // 2 - 3
         offset_y = self.height // 2 - 2
 
+        self.mold_positions = []
         # "Paint" the 42 into the visited matrix
         for dx, dy in mold_42:
             x_real = offset_x + dx
             y_real = offset_y + dy
             # Only if the point falls inside the maze (safety check)
             if 0 <= x_real < self.width and 0 <= y_real < self.height:
-                self.visited[y_real][x_real] = True
+                self.grid[y_real][x_real] = 15
+                self.mold_positions.append((x_real, y_real))
 
         # Define Entry [Top-Left] and Exit (Bottom-Right)
         self.entry = entry
@@ -139,6 +141,9 @@ class MazeGenerator:
                 # We go back to the previous cell in the path
                 # by popping the stack.
                 stack.pop()
+
+        for x, y in self.mold_positions:
+            self.grid[y][x] = 0
         """
         Open the maze entrance and exit to the outside
         by removing the wall bit(s) that touch
@@ -195,16 +200,7 @@ class MazeGenerator:
     def save_to_file(self):
         # Hexadecimal reference for bitwise values (0-15)
         hexa = "0123456789abcdef"
-        text = ""
-
-        # Iterate through the grid row by row
-        for f in range(self.height):
-            for c in range(self.width):
-                # Get cell value and convert it to its hex character
-                valor = self.grid[f][c]
-                character = hexa[valor]
-                text += character
-
-        # Write the resulting string into the output file
-        with open(self.output_file, "w") as file:
-            file.write(text)
+        content = "".join(
+            "".join(hexa[cell] for cell in row) for row in self.grid)
+        with open(self.output_file, "w") as f:
+            f.write(content)
