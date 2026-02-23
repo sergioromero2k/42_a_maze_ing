@@ -48,6 +48,7 @@ To make your life easier, we've automated the entire setup and execution process
 
 | Command | Action |
 |---------|--------|
+| `make all` | **Recommended:** Execute all |
 | `make venv` | **Recommended:** Creates a virtual environment and installs all dependencies. |
 | `make run` | Runs the maze generator with the default `config.txt`. |
 | `make package` | Generates the mandatory `.whl` file for submission. |
@@ -147,7 +148,6 @@ The project is split into two independent packages:
 │   └── graphical.py       # MLX visualization logic
 ├── docs/                  # Project guides and documentation
 │   ├── ES/                # Translation into Spanish
-│   ├── activate_venv.md
 │   ├── differentes_cases_config.txt
 │   ├── es.subject_a_maze_py.pdf
 │   ├── execution_whl.md

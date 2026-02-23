@@ -49,6 +49,7 @@ Para facilitarte el trabajo, hemos automatizado todo el proceso de configuració
 
 | Comando | Acción |
 |---------|--------|
+| `make all` | **Recomendado:** Ejecuta todo |
 | `make venv` | **Recomendado:** Crea un entorno virtual e instala todas las dependencias. |
 | `make run` | Ejecuta el generador de laberintos con el `config.txt` por defecto. |
 | `make package` | Genera el archivo `.whl` obligatorio para la entrega. |
@@ -148,7 +149,6 @@ El proyecto está dividido en dos paquetes independientes:
 │   └── graphical.py       # Lógica de visualización con MLX
 ├── docs/                  # Guías y documentación del proyecto
 │   ├── ES/                # Traducción a español
-│   ├── activate_venv.md
 │   ├── differentes_cases_config.txt
 │   ├── es.subject_a_maze_py.pdf
 │   ├── execution_whl.md
