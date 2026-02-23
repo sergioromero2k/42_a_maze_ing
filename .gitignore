@@ -48,7 +48,6 @@ generated/
 *.gif
 *.bmp
 *.svg
-*.txt
 *.json
 
 # Jupyter

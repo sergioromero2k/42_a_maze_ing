@@ -1,0 +1,141 @@
+# TEST 1 - SHOULD PASS: Standard configuration with fixed seed and perfect maze
+WIDTH=12
+HEIGHT=25
+ENTRY=0,6
+EXIT=24,6
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+SEED=12345
+
+# TEST 2 - SHOULD FAIL: Exit coordinates out of bounds (20,20 does not exist in a 10x10 grid)
+WIDTH=10
+HEIGHT=10
+ENTRY=0,0
+EXIT=20,20
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+
+# TEST 3 - SHOULD FAIL: Broken syntax, first line uses ':' instead of '='
+WIDTH:10
+HEIGHT=10
+ENTRY=0,0
+EXIT=9,9
+
+# TEST 4 - SHOULD PASS: Non-perfect maze (braid), allows multiple paths and loops
+WIDTH=15
+HEIGHT=15
+ENTRY=0,0
+EXIT=14,14
+OUTPUT_FILE=output_maze.txt
+PERFECT=False
+
+# TEST 5 - SHOULD PASS WITH WARNING: Maze too small for '42' pattern (requires at least 7x5)
+WIDTH=4
+HEIGHT=4
+ENTRY=0,0
+EXIT=3,3
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+
+# TEST 6 - SHOULD PASS: Small maze 10x10 with seed, entry and exit on opposite corners
+WIDTH=10
+HEIGHT=10
+ENTRY=0,0
+EXIT=9,9
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+SEED=1111
+
+# TEST 7 - SHOULD PASS: Medium maze 20x20 with seed, entry and exit on left/right center
+WIDTH=20
+HEIGHT=20
+ENTRY=0,10
+EXIT=19,10
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+SEED=2222
+
+# TEST 8 - SHOULD PASS: Medium maze 30x30 with seed, entry top-left exit bottom-right
+WIDTH=30
+HEIGHT=30
+ENTRY=0,0
+EXIT=29,29
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+SEED=3333
+
+# TEST 9 - SHOULD PASS: Large maze 50x50 with seed, entry and exit on opposite sides mid
+WIDTH=50
+HEIGHT=50
+ENTRY=0,25
+EXIT=49,25
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+SEED=4444
+
+# TEST 10 - SHOULD PASS: Large maze 80x40 wide format with seed, entry top-center exit bottom-center
+WIDTH=80
+HEIGHT=40
+ENTRY=0,20
+EXIT=39,20
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+SEED=5555
+
+# TEST 11 - SHOULD PASS: Large maze 100x100 with seed, entry and exit on opposite corners
+WIDTH=100
+HEIGHT=100
+ENTRY=0,0
+EXIT=99,99
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+SEED=6666
+
+# TEST 12 - SHOULD PASS: Non-perfect 50x50 with seed, multiple paths expected
+WIDTH=50
+HEIGHT=50
+ENTRY=0,0
+EXIT=49,49
+OUTPUT_FILE=output_maze.txt
+PERFECT=False
+SEED=7777
+
+# TEST 13 - SHOULD PASS: Opposite sides middle-to-middle, forces maze to cross horizontally through the '42' pattern
+WIDTH=30
+HEIGHT=20
+ENTRY=10,0
+EXIT=10,29
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+
+# TEST 14 - SHOULD PASS: Vertical tunnel with offset entry/exit, path cannot be a straight line
+WIDTH=25
+HEIGHT=25
+ENTRY=0,5
+EXIT=24,20
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+
+# TEST 15 - SHOULD PASS: L-Shape path, entry on left wall and exit on bottom wall, non-perfect with loops
+WIDTH=20
+HEIGHT=20
+ENTRY=0,10
+EXIT=10,19
+OUTPUT_FILE=output_maze.txt
+PERFECT=False
+
+# TEST 16 - SHOULD PASS: Mirror effect, both entry and exit on the same wall, solver must loop around the entire maze
+WIDTH=20
+HEIGHT=20
+ENTRY=5,0
+EXIT=15,0
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+
+# TEST 17 - SHOULD PASS: A little bit inside the top corner
+WIDTH=31
+HEIGHT=31
+ENTRY=2,2
+EXIT=28,28
+OUTPUT_FILE=output_maze.txt
+PERFECT=True

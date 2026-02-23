@@ -31,8 +31,7 @@ def get_raw_config(file_path: str) -> Dict[str, str]:
                     value = value.strip()
                     key = key.strip()
                     if not key:
-                        raise Exception(
-                            f"ignored (empty key): {line}")
+                        raise Exception(f"ignored (empty key): {line}")
                     raw_data[key] = value
     except FileNotFoundError:
         print(f"Error: the file {file_path} does not exist.")
@@ -46,6 +45,9 @@ def get_raw_config(file_path: str) -> Dict[str, str]:
 def format_value(key: str, value: str) -> Any:
     # Converts a string value to the appropriate Python type based on the key.
     try:
+        # Clean quotes if they exist (e.g. PERFECT='False' -> False)
+        value = value.replace("'", "").replace('"', "")
+
         if key in ("WIDTH", "HEIGHT"):
             n = int(value)
             if n <= 0:
@@ -61,18 +63,19 @@ def format_value(key: str, value: str) -> Any:
             parts = value.split(",")
             if len(parts) != 2:
                 raise ValueError(f"Invalid value for {key}: {value}")
-            value = (int(parts[0]), int(parts[1]))
-            return value
+            return (int(parts[0]), int(parts[1]))
         elif key == "PERFECT":
+            # Modified to accept both True and False
             if value.lower() == "true":
-                value = True
+                return True
+            elif value.lower() == "false":
+                return False
             else:
-                raise ValueError("PERFECT must be true")
+                raise ValueError("PERFECT must be 'True' or 'False'")
         # Default: keep as string
         return value
     except ValueError as e:
         print(f"Error converting {key}=‘{value}’: {e}")
-        # The program will end and close.
         sys.exit(1)
 
 
@@ -80,8 +83,7 @@ def format_config(raw_data: Dict[str, str]) -> Dict[str, Any]:
     # Receives the string dictionary and returns the correct types.
     return {
         key.lower(): format_value(key, value)
-        for key, value in raw_data.items()
-    }
+        for key, value in raw_data.items()}
 
 
 def validate_logic(config: Dict[str, Any]) -> bool:

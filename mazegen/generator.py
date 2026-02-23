@@ -7,6 +7,7 @@ class MazeGenerator:
     """
     Class responsible for generating a maze with a centered '42' pattern.
     """
+
     def __init__(
         self,
         width: int,
@@ -48,7 +49,7 @@ class MazeGenerator:
         self.setup_matrices()
         self.draw_42()
 
-    def setup_matrices(self):
+    def setup_matrices(self) -> None:
         """
         Initializes the grid with all walls closed (15) and visit tracker.
         """
@@ -107,18 +108,17 @@ class MazeGenerator:
                 self.mold_positions.append((r_real, c_real))
 
     def generate(self) -> None:
-        """Generate the maze using the Recursive Backtracker (DFS) algorithm.
-        The algorithm ensures that the maze is perfect (expansion tree).
-        """
+        """Generate the maze using DFS and handle perfection logic."""
+        # Mark '42' cells as visited to block them
         for r, c in self.mold_positions:
             self.visited[r][c] = True
-            # Keep grid[r][c] = 15 (solid block)
 
         stack: List[Tuple[int, int]] = []
         r_start, c_start = self.entry
         stack.append((r_start, c_start))
         self.visited[r_start][c_start] = True
 
+        # Standard DFS for Perfect Maze
         while stack:
             cr, cc = stack[-1]
             neighbors = self._get_unvisited_neighbors(cr, cc)
@@ -131,30 +131,36 @@ class MazeGenerator:
                 stack.append((nr, nc))
             else:
                 stack.pop()
-        """
-        Open the maze entrance and exit to the outside
-        by removing the wall bit(s) that touch
-        the grid border (N=1, E=2, S=4, W=8).
 
-        For earch of the two cells (entry and exit), we check
-        if lies on the North/South/West/East edge and clear the
-        corresponding wall using bit by bit AND with
-        the negated mask (&=~mask).
-        """
-        # Open entrance and exit to the outside.
+        # If NOT perfect, break some extra walls to create loops
+        if not self.perfect:
+            self._break_extra_walls()
+
+        # Open entrance and exit
         for row, col in [self.entry, self.exit]:
-            # Northern Border
             if row == 0:
                 self.grid[row][col] &= ~1
-                # Southern Border
             elif row == self.height - 1:
                 self.grid[row][col] &= ~4
-            # West Border
             if col == 0:
                 self.grid[row][col] &= ~8
-            # East Edge
             elif col == self.width - 1:
                 self.grid[row][col] &= ~2
+
+    def _break_extra_walls(self) -> None:
+        """Breaks random walls to create a non-perfect maze (braid maze)."""
+        extra_walls = (self.width * self.height) // 10
+        for _ in range(extra_walls):
+            r = random.randint(1, self.height - 2)
+            c = random.randint(1, self.width - 2)
+            # Break a random wall (North or East) if it exists
+            wall = random.choice([1, 2])
+            if self.grid[r][c] & wall:
+                self.grid[r][c] &= ~wall
+                if wall == 1:
+                    self.grid[r - 1][c] &= ~4
+                else:
+                    self.grid[r][c + 1] &= ~8
 
     def _get_unvisited_neighbors(
         self, r: int, c: int
@@ -184,10 +190,27 @@ class MazeGenerator:
                 neighbors.append((nr, nc, bit, opp_bit))
         return neighbors
 
-    def save_to_file(self):
-        """Saves the grid as a hexadecimal string to the output file."""
-        hexa = "0123456789abcdef"
-        content = "".join(
-            "".join(hexa[cell] for cell in row) for row in self.grid)
+    def save_to_file(self, solution: str) -> None:
+        """
+        Save the maze following the strict format:
+        - Hex grid (one row per line)
+        - Empty line
+        - Entry coordinates
+        - Exit coordinates
+        - Solution path
+        """
+        hexa = "0123456789ABCDEF"
         with open(self.output_file, "w") as f:
-            f.write(content)
+            # Write the hex grid: one row per line
+            for row in self.grid:
+                f.write("".join(hexa[cell] for cell in row) + "\n")
+
+            # Empty line
+            f.write("\n")
+
+            # Entry coordinates (row, col) + "\n"
+            f.write(f"{self.entry[0]},{self.entry[1]}\n")
+            # Exit coordinates (row, col) + \n
+            f.write(f"{self.exit[0]},{self.exit[1]}\n")
+            # Shortest path string + \n
+            f.write(f"{solution}\n")

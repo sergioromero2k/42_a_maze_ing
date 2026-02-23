@@ -1,107 +1,203 @@
-*This project has been created as part of the 42 curriculum by serromer and dcasado-.*
+*Created as part of the 42 curriculum by **serromer** and **dcasado-**.*
 
-## 1. Teoría Fundamental a Estudiar
+# 42_A_MAZE_ING — The Perfect Maze Generator
+---
 
-Antes de tocar el teclado, necesitas comprender los conceptos matemáticos y computacionales detrás de los laberintos:
+## What is this?
 
-### Teoría de Grafos
-- Entender que un laberinto perfecto es, en esencia, un **Árbol de Expansión Mínimo** (Spanning Tree).
+**A-Maze-ing** is a Python suite for generating and solving **perfect mazes** — mazes where any two points are connected by exactly one path, with no loops and no unreachable areas (a spanning tree, in graph theory terms).
 
-### Algoritmos de Generación
-Investiga los más comunes:
-- **Recursive Backtracker (DFS)**: Fácil de implementar, genera caminos largos y sinuosos.
-- **Prim**: Genera laberintos más "compactos" y ramificados.
-- **Kruskal**: Muy eficiente para asegurar que no haya ciclos.
-
-### Búsqueda de Caminos (Pathfinding)
-Necesitarás algoritmos como **BFS** (para el camino más corto) o **A*** para resolver el laberinto.
-
-### Representación Binaria/Hexadecimal
-- Repasa cómo usar bits para representar paredes (N=1, E=2, S=4, W=8) y cómo convertirlos a hexadecimal.
+Beyond the algorithm, the project embeds a mandatory **"42" visual pattern** into every maze, ships a live graphical visualizer, and exports results in a compact hexadecimal wall-encoding format.
 
 ---
 
-## 2. Pasos para Comenzar (Plan de Trabajo)
+## Features
 
-### Fase 1: Configuración del Entorno y Estándares
-- **Entorno Virtual**: Crea un entorno con `venv` o `conda`.
-- **Linter y Tipado**: Configura `flake8` para el estilo de código y `mypy` para las anotaciones de tipo, ya que son obligatorios para aprobar.
-- **Makefile**: Escribe las reglas básicas (install, run, lint, clean) para automatizar el flujo desde el día uno.
-
-### Fase 2: El Corazón del Proyecto (Lógica de Generación)
-- **Módulo Reutilizable**: Diseña el generador como una clase independiente (`MazeGenerator`) dentro de un paquete instalable con `pip`.
-- **Parser de Configuración**: Crea una función que lea el archivo `config.txt` y valide que todos los parámetros (WIDTH, HEIGHT, ENTRY, EXIT, etc.) sean correctos.
-- **Algoritmo de Generación**: Implementa la lógica de creación asegurando que se pueda usar una semilla para reproducibilidad.
-- **Patrón "42"**: Asegúrate de que el laberinto incluya visualmente el número "42" formado por celdas cerradas.
-
-### Fase 3: Salida y Visualización
-- **Exportación a Archivo**: Genera el archivo de salida con el formato hexadecimal, coordenadas de entrada/salida y el camino corto resuelto.
-- **Representación Visual**: Implementa una interfaz en ASCII (terminal) o gráfica (MiniLibX) que permita interactuar: regenerar, mostrar solución y cambiar colores.
-
-### Fase 4: Documentación y Entrega
-- **README.md**: Debe ser muy detallado, incluyendo roles del equipo, decisiones técnicas y el uso de IA.
-- **Empaquetado**: Crea el archivo `.whl` o `.tar.gz` de tu módulo de generación.
+- **Perfect maze guarantee** — single-path connectivity via spanning tree logic.
+- **"42" easter egg** — the 42 logo is carved into the maze walls before generation begins.
+- **Deterministic seeds** — reproduce any maze exactly with a given seed.
+- **Interactive visualizer** — MiniLibX-powered window with real-time controls.
+- **Hex export** — 4-bit wall encoding written to a configurable output file.
 
 ---
 
-## 3. Estimación y Dificultad
-- **Dificultad**: Media-Alta. No por la complejidad del código en sí, sino por la rigurosidad de los estándares (`flake8`, `mypy`), la gestión de excepciones y los requisitos de empaquetado de Python.
-- **Tiempo Estimado**:
-  - Estudiantes dedicados: **1 a 2 semanas**.
-  - Ritmo pausado: **3 a 4 semanas**.
+## Prerequisites
 
-**Nota**: La lógica del laberinto se resuelve rápido, pero dejar el código "limpio" y profesional según las reglas del Capítulo III suele llevar el 50% del tiempo.
+- Python 3.10+
+- `pip`
+- `X11` libraries (required for MiniLibX graphical output)
 
 ---
 
-### Archivos adicionales
+## Installation
 
-- `test_suite_extra/` → Contiene archivos de teoría y ejercicios extra de datos. No son necesarios para ejecutar el proyecto.
+From the project root, install in editable mode:
 
-
-## 4. Un consejo sobre la IA en 42
-El documento es muy claro: usa la IA para tareas tediosas (como generar el Makefile o estructuras repetitivas), pero nunca copies código que no entiendas. En la evaluación te pedirán modificar el código en vivo para demostrar que tú tienes el control.
-
-
-### Arbol estructura
-
-```
-a_maze_ing/
-├── .gitignore              # Archivo para excluir .pyc, __pycache__ y venv.
-├── Makefile                # Automatización: install, run, lint, etc..
-├── README.md               # Documentación general y del equipo.
-├── config.txt              # Archivo de configuración por defecto.
-├── pyproject.toml          # Configuración moderna de empaquetado (reemplaza a setup.py).
-├── a_maze_ing.py           # Script principal (punto de entrada obligatorio).
-│
-├── mazegen/                # El módulo reutilizable.
-│   ├── __init__.py         # Expone la clase MazeGenerator.
-│   ├── generator.py        # Lógica del algoritmo de generación (clase MazeGenerator).
-│   ├── solver.py           # Lógica para encontrar el camino más corto.
-│   ├── utils.py            # Manejo de archivos (hexadecimal) y validaciones.
-│   └── py.typed            # Indica a mypy que el paquete tiene tipos.
-│
-├── display/                # Lógica de representación visual.
-│   ├── __init__.py
-│   ├── terminal.py         # Renderizado ASCII e interacciones de consola.
-│   └── graphical.py        # (Opcional) Visualización con MiniLibX.
-│
-├── tests/                  # Programas de prueba (no se entregan para nota).
-│   └── test_logic.py
-│
-└── dist/                   # Aquí se generará tu .whl o .tar.gz tras el build.
-```
-
-Este módulo permite la creación de laberintos perfectos mediante el algoritmo **Recursive Backtracker (DFS)** 
-y su resolución óptima usando **Breadth-First Search (BFS)**.
-
-## Instalación
-
-Este módulo permite la creación de laberintos perfectos mediante el algoritmo **Recursive Backtracker (DFS)** 
-y su resolución óptima usando **Breadth-First Search (BFS)**.
-
-## Instalación
-
-Desde la carpeta raíz del proyecto, instala el paquete en modo editable:
 ```bash
+make install
 pip install -e .
+```
+
+---
+
+## Usage
+
+Run with the default config file:
+
+```bash
+make run
+```
+
+Or point to a custom config:
+
+```bash
+python3 a_maze_ing.py config.txt
+```
+
+### Visualizer Controls
+
+| Key | Action |
+|-----|--------|
+| `R` | Regenerate maze with a new random seed |
+| `S` | Toggle shortest-path solution (BFS) |
+| `C` | Cycle color palettes |
+| `ESC` / Close window | Exit gracefully |
+
+---
+
+## Configuration File
+
+Key-value format. Lines starting with `#` are comments and are ignored.
+
+| Key | Description |
+|-----|-------------|
+| `WIDTH` / `HEIGHT` | Must be **odd integers** (e.g. `31`) to maintain cell-wall symmetry |
+| `ENTRY` / `EXIT` | Zero-indexed coordinates as `x,y` |
+| `SEED` | Integer for reproducible generation |
+| `OUTPUT_FILE` | Destination for the hex-encoded maze |
+| `PERFECT` | `True` for DFS generation |
+
+### Example
+
+```ini
+# Project Configuration
+WIDTH=31
+HEIGHT=31
+ENTRY=1,1
+EXIT=29,29
+SEED=4242
+OUTPUT_FILE=output_maze.txt
+PERFECT=True
+```
+
+---
+
+## How It Works
+
+### Wall Encoding — 4-bit Bitwise Logic
+
+Each cell is represented by 4 bits, one per direction:
+
+| Direction | Bit | Value |
+|-----------|-----|-------|
+| North | 0 | 1 |
+| East  | 1 | 2 |
+| South | 2 | 4 |
+| West  | 3 | 8 |
+
+A cell with value `0x9` (`1001` in binary) has open walls to the **North** and **West**.
+
+### Generation — Recursive Backtracker (DFS)
+
+DFS was chosen for its aesthetic output: high tortuosity and long, winding dead-ends — far more visually compelling than Prim's algorithm, which tends to produce many short branches.
+
+The **"42" pattern** is carved out *before* generation starts. Those cells are pre-marked as visited, so the DFS flows around them and preserves the shape.
+
+### Solving — Breadth-First Search (BFS)
+
+In a perfect maze there are no cycles, so the first time BFS reaches the exit, the path found is guaranteed to be the **only** (and therefore shortest) path.
+
+---
+
+## Project Structure
+
+The project is split into two independent packages:
+
+- **`mazegen`** — pure generation logic, no UI dependencies. Can be used in CLI tools or notebooks.
+- **`display`** — visualization layer. Can be swapped for Pygame or Matplotlib without touching generation logic.
+
+```
+42_a_maze_ing
+├── a_maze_ing.py          # Main entry point (the "brain")
+├── config.txt             # Sample configuration file
+├── Makefile               # Automation tool (all, run, clean, lint, re)
+├── pyproject.toml         # Modern Python project metadata & config
+├── README.md              # Project documentation
+├── display/               # Graphical module
+│   ├── __init__.py
+│   └── graphical.py       # MLX visualization logic
+├── docs/                  # Project guides and documentation
+│   ├── ES/                # Translation into Spanish
+│   ├── activate_venv.md
+│   ├── differentes_cases_config.txt
+│   ├── es.subject_a_maze_py.pdf
+│   ├── execution_whl.md
+│   ├── mlx_setup.md
+│   ├── output_validator.py
+│   └── project_division.md
+├── libs/                  # Offline dependencies (WHL files)
+│   ├── mlx-2.2-py3-fedora-any.whl
+│   └── mlx-2.2-py3-ubuntu-any.whl
+├── mazegen/               # Core logic package
+│   ├── __init__.py
+│   ├── generator.py       # Maze generation (DFS + 42 pattern)
+│   ├── py.typed           # Support for Mypy type checking
+│   ├── solver.py          # Solving algorithm (BFS)
+│   └── utils.py           # Config parser and helpers
+├── mlx_source/            # MLX Python bindings source
+│   ├── __init__.py
+│   ├── mlx.py
+│   └── docs/              # Man pages and headers
+│       ├── mlx.3
+│       ├── mlx.h
+│       └── ... (other .3 files)
+├── tests/                 # Unit tests for logic and window
+│   ├── test_logic.py
+│   └── test_window.py
+└── .gitignore             # File to prevent tracking caches/garbage
+```
+
+---
+
+## Team
+
+| Member | Role |
+|--------|------|
+| **serromer** | Lead Architect — MazeGenerator engine, DFS logic, Python packaging, Makefile |
+| **dcasado-** | Lead Developer — BFS Solver, config parser, MiniLibX graphical interface |
+
+### Planning vs. Reality
+
+The "42" pattern injection took longer than expected, pushing the generator from Day 2 to Day 3. We recovered the time by defining a shared interface (Abstract Base Classes) early, which allowed the UI and logic to be integrated in under 2 hours.
+
+Using `mypy --strict` from day one prevented dozens of `NoneType` errors during integration — highly recommended.
+
+---
+
+## AI Disclosure
+
+AI tools were used strictly for non-algorithmic tasks:
+
+- Generating `Makefile` and `pyproject.toml` templates
+- Boilerplate for signal handling (`SIGINT`)
+- Drafting and translating documentation
+
+All core algorithms (DFS / BFS) were designed and implemented by the team to ensure academic integrity.
+
+---
+
+## Resources
+
+- [Maze Generation Algorithms](https://en.wikipedia.org/wiki/Maze_generation_algorithm) — theoretical foundation
+- [Python Packaging User Guide](https://packaging.python.org/) — `pyproject.toml` standards
+
