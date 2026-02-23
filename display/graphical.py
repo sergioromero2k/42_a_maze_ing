@@ -1,92 +1,149 @@
+#!/usr/bin/env python3
 import sys
-from mlx_source import Mlx
+import os
+from typing import List, Tuple, Any
+from mlx import Mlx
 
 
 class MazeVisualizer:
-    def __init__(self, maze):
+    """Graphical visualizer that renders the '42' as solid obstacles."""
+
+    def __init__(
+        self, maze: List[List[int]], path: str = "", entry: Tuple[int, int] = (0, 0)
+    ) -> None:
+        """Init MLX and calculate dimensions."""
         self.maze = maze
+        self.path = path
+        self.entry = entry
         self.tile = 20
         self.rows = len(maze)
         self.cols = len(maze[0])
 
-        # Calculamos el ancho real necesario
-        self.actual_width = self.cols * self.tile
-        self.actual_height = self.rows * self.tile
+        # Identify 42 cells for solid rendering
+        self.mold_positions = self._get_mold_coords()
 
-        # Para evitar el "doblado", la imagen debe crearse con un ancho que MLX acepte bien.
-        # Pero la VENTANA debe medir lo que mide el laberinto.
+        self.w_win = self.cols * self.tile
+        self.h_win = self.rows * self.tile
         self.m = Mlx()
-        self.ptr = self.m.mlx_init()
-        self.win = self.m.mlx_new_window(
-            self.ptr, self.actual_width, self.actual_height, "Maze 42"
+        self.ptr: Any = self.m.mlx_init()
+        self.win: Any = self.m.mlx_new_window(
+            self.ptr, self.w_win, self.h_win, "Maze 42"
         )
+        self.img: Any = self.m.mlx_new_image(self.ptr, self.w_win, self.h_win)
 
-        # La imagen la creamos del tamaño exacto de la ventana
-        self.img = self.m.mlx_new_image(self.ptr, self.actual_width, self.actual_height)
-
-        # Obtenemos el size_line (self.line) que es el que manda
         res = self.m.mlx_get_data_addr(self.img)
-        self.addr, self.bpp, self.line, self.endian = res
+        self.addr, self.line = res[0], res[2]
 
-    def put_pixel(self, x, y, color):
-        # IMPORTANTE: Usar los límites reales de la ventana
-        if 0 <= x < self.actual_width and 0 <= y < self.actual_height:
-            # ESTA FÓRMULA ES LA QUE EVITA QUE SE DOBLE:
-            # y * salto_de_línea_real + x * bytes_por_píxel
+    def _get_mold_coords(self) -> List[Tuple[int, int]]:
+        """Recalculate stencil positions for rendering."""
+        mold = {
+            (0, 0),
+            (1, 0),
+            (2, 0),
+            (2, 1),
+            (0, 2),
+            (1, 2),
+            (2, 2),
+            (3, 2),
+            (4, 2),
+            (0, 4),
+            (0, 5),
+            (0, 6),
+            (1, 6),
+            (2, 6),
+            (2, 5),
+            (2, 4),
+            (3, 4),
+            (4, 4),
+            (4, 5),
+            (4, 6),
+        }
+        off_r, off_c = self.rows // 2 - 2, self.cols // 2 - 3
+        return [(off_r + dy, off_c + dx) for dy, dx in mold]
+
+    def put_pixel(self, x: int, y: int, color: int) -> None:
+        """Draw pixel in buffer."""
+        if 0 <= x < self.w_win and 0 <= y < self.h_win:
             pos = (y * self.line) + (x * 4)
+            self.addr[pos] = color & 0xFF
+            self.addr[pos + 1] = (color >> 8) & 0xFF
+            self.addr[pos + 2] = (color >> 16) & 0xFF
+            self.addr[pos + 3] = 255
 
-            try:
-                self.addr[pos] = color & 0xFF  # Blue
-                self.addr[pos + 1] = (color >> 8) & 0xFF  # Green
-                self.addr[pos + 2] = (color >> 16) & 0xFF  # Red
-                self.addr[pos + 3] = 255  # Alpha
-            except IndexError:
-                pass
+    def draw_tile(self, tx: int, ty: int, val: int) -> None:
+        """Draw tile. If part of 42, draw as solid block."""
+        x0, y0 = tx * self.tile, ty * self.tile
 
-    def draw_tile(self, tx, ty, val):
-        # tx es la columna (x), ty es la fila (y)
-        x0 = tx * self.tile
-        y0 = ty * self.tile
+        if (ty, tx) in self.mold_positions:
+            for i in range(self.tile):
+                for j in range(self.tile):
+                    self.put_pixel(x0 + i, y0 + j, 0x333333)  # Solid Gray
+            return
 
-        # Fondo del 42 (Gris oscuro) o laberinto (Negro)
-        bg = 0x222222 if val == 0 else 0x000000
-        for dy in range(self.tile):
-            for dx in range(self.tile):
-                self.put_pixel(x0 + dx, y0 + dy, bg)
+        # Regular background and walls
+        for i in range(self.tile):
+            for j in range(self.tile):
+                self.put_pixel(x0 + i, y0 + j, 0x000000)
 
-        # Paredes blancas
-        w = 2
-        if val & 1:  # Norte
+        w, color = 2, 0xFFFFFF
+        if val & 1:  # N
             for i in range(self.tile):
                 for j in range(w):
-                    self.put_pixel(x0 + i, y0 + j, 0xFFFFFF)
-        if val & 2:  # Este
+                    self.put_pixel(x0 + i, y0 + j, color)
+        if val & 2:  # E
             for i in range(w):
                 for j in range(self.tile):
-                    self.put_pixel(x0 + self.tile - 1 - i, y0 + j, 0xFFFFFF)
-        if val & 4:  # Sur
+                    self.put_pixel(x0 + self.tile - 1 - i, y0 + j, color)
+        if val & 4:  # S
             for i in range(self.tile):
                 for j in range(w):
-                    self.put_pixel(x0 + i, y0 + self.tile - 1 - j, 0xFFFFFF)
-        if val & 8:  # Oeste
+                    self.put_pixel(x0 + i, y0 + self.tile - 1 - j, color)
+        if val & 8:  # W
             for i in range(w):
                 for j in range(self.tile):
-                    self.put_pixel(x0 + i, y0 + j, 0xFFFFFF)
+                    self.put_pixel(x0 + i, y0 + j, color)
 
-    def render(self, *args):
-        # Recorremos la matriz: maze[fila][columna]
-        for y in range(self.rows):
-            for x in range(self.cols):
-                # Dibujamos en (x, y) el valor de maze[y][x]
-                self.draw_tile(x, y, self.maze[y][x])
+    def draw_path(self) -> None:
+        """Trace solution path."""
+        cr, cc = self.entry
+        self.fill_rect(cc, cr, 0xFF0000)
+        for move in self.path:
+            if move == "N":
+                cr -= 1
+            elif move == "S":
+                cr += 1
+            elif move == "E":
+                cc += 1
+            elif move == "W":
+                cc -= 1
+            self.fill_rect(cc, cr, 0xFF0000)
 
-        self.m.mlx_put_image_to_window(self.ptr, self.win, self.img, 0, 0)
-        self.m.mlx_do_sync(self.ptr)
+    def fill_rect(self, col: int, row: int, color: int) -> None:
+        """Helper for path squares."""
+        m = self.tile // 4
+        x0, y0 = col * self.tile + m, row * self.tile + m
+        s = self.tile - (m * 2)
+        for i in range(s):
+            for j in range(s):
+                self.put_pixel(x0 + i, y0 + j, color)
+
+    def render(self, *args: Any) -> int:
+        """Render frame."""
+        try:
+            for y in range(self.rows):
+                for x in range(self.cols):
+                    self.draw_tile(x, y, self.maze[y][x])
+            if self.path:
+                self.draw_path()
+            self.m.mlx_put_image_to_window(self.ptr, self.win, self.img, 0, 0)
+        except Exception:
+            os._exit(0)
         return 0
 
-    def run(self):
+    def run(self) -> None:
+        """Start MLX loop."""
         self.m.mlx_key_hook(
-            self.win, lambda k, p: sys.exit(0) if k in [65307, 53] else 0, None
+            self.win, lambda k, p: os._exit(0) if k in [65307, 53] else 0, None
         )
         self.m.mlx_loop_hook(self.ptr, self.render, None)
         self.m.mlx_loop(self.ptr)

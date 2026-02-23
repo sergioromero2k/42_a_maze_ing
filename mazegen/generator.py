@@ -110,6 +110,10 @@ class MazeGenerator:
         """Generate the maze using the Recursive Backtracker (DFS) algorithm.
         The algorithm ensures that the maze is perfect (expansion tree).
         """
+        for r, c in self.mold_positions:
+            self.visited[r][c] = True
+            # Keep grid[r][c] = 15 (solid block)
+
         stack: List[Tuple[int, int]] = []
         r_start, c_start = self.entry
         stack.append((r_start, c_start))
@@ -120,22 +124,13 @@ class MazeGenerator:
             neighbors = self._get_unvisited_neighbors(cr, cc)
 
             if neighbors:
-                nr, nc, direction, opp_direction = random.choice(neighbors)
-                # We remove the walls (bitwise) between
-                # the current cell and the neighboring cell.
-                self.grid[cr][cc] -= direction
-                self.grid[nr][nc] -= opp_direction
+                nr, nc, d, opp = random.choice(neighbors)
+                self.grid[cr][cc] -= d
+                self.grid[nr][nc] -= opp
                 self.visited[nr][nc] = True
                 stack.append((nr, nc))
             else:
-                # Backtracking step:
-                # If the current cell has no unvisited neighbors,
-                # We go back to the previous cell in the path
-                # by popping the stack.
                 stack.pop()
-
-        for r, c in self.mold_positions:
-            self.grid[r][c] = 0
         """
         Open the maze entrance and exit to the outside
         by removing the wall bit(s) that touch
