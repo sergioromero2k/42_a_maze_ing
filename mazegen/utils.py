@@ -45,37 +45,28 @@ def get_raw_config(file_path: str) -> Dict[str, str]:
 def format_value(key: str, value: str) -> Any:
     # Converts a string value to the appropriate Python type based on the key.
     try:
-        # Clean quotes if they exist (e.g. PERFECT='False' -> False)
         value = value.replace("'", "").replace('"', "")
 
         if key in ("WIDTH", "HEIGHT"):
             n = int(value)
             if n <= 0:
                 raise ValueError(f"{key} must be a positive number")
-            if key == "WIDTH" and n < 7:
-                raise ValueError(
-                    "WIDTH is too small for the stencil (minimum 7).")
-            if key == "HEIGHT" and n < 5:
-                raise ValueError(
-                    "HEIGHT is too small for the stencil (minimum 5).")
             return n
         elif key in ("ENTRY", "EXIT"):
             parts = value.split(",")
             if len(parts) != 2:
                 raise ValueError(f"Invalid value for {key}: {value}")
-            return (int(parts[0]), int(parts[1]))
+            return (int(parts[1]), int(parts[0]))
         elif key == "PERFECT":
-            # Modified to accept both True and False
             if value.lower() == "true":
                 return True
             elif value.lower() == "false":
                 return False
             else:
                 raise ValueError("PERFECT must be 'True' or 'False'")
-        # Default: keep as string
         return value
     except ValueError as e:
-        print(f"Error converting {key}=‘{value}’: {e}")
+        print(f"Error converting {key}='{value}': {e}")
         sys.exit(1)
 
 
@@ -87,33 +78,22 @@ def format_config(raw_data: Dict[str, str]) -> Dict[str, Any]:
 
 
 def validate_logic(config: Dict[str, Any]) -> bool:
-    # Validate the main configuration: ensures WIDTH, HEIGHT, ENTRY, and EXIT
     width = config["width"]
     height = config["height"]
     entry = config["entry"]
     exit_ = config["exit"]
 
-    # Basic sanity check: width and height must exist and not be empty/zero.
     if not width or not height:
         raise ConfigError("Config.txt is missing WIDTH or HEIGHT")
 
-    # Validate that ENTRY coordinates are inside the map boundaries.
-    # entry[0] is row (y), entry[1] is col (x)
-    if not (0 <= entry[0] < height):
+    # Validamos usando la lógica interna de tu programa (y < height, x < width)
+    if not (0 <= entry[0] < height) or not (0 <= entry[1] < width):
         raise ConfigError(
-            f"Entry ROW out of map: {entry[0]} with height = {height}")
-    if not (0 <= entry[1] < width):
-        raise ConfigError(
-            f"Entry COL out of map: {entry[1]} with width = {width}")
+            f"Entry {entry} out of bounds for {height}x{width}")
 
-    # Validate that EXIT coordinates are inside the map boundaries.
-    # exit_[0] is row (y), exit_[1] is col (x)
-    if not (0 <= exit_[0] < height):
+    if not (0 <= exit_[0] < height) or not (0 <= exit_[1] < width):
         raise ConfigError(
-            f"Exit ROW out of map: {exit_[0]} with height = {height}")
-    if not (0 <= exit_[1] < width):
-        raise ConfigError(
-            f"Exit COL out of map: {exit_[1]} with width = {width}")
+            f"Exit {exit_} out of bounds for {height}x{width}")
 
     return True
 

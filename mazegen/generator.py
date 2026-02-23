@@ -37,10 +37,6 @@ class MazeGenerator:
         self.exit: Tuple[int, int] = exit
         self.output_file: str = output_file
         self.perfect: bool = perfect
-
-        # Attributes initialized in setup_matrices
-        self.grid: List[List[int]] = []
-        self.visited: List[List[bool]] = []
         self.mold_positions: List[Tuple[int, int]] = []
 
         # We configure randomness with the seed.
@@ -61,7 +57,7 @@ class MazeGenerator:
             [False for _ in range(self.width)] for _ in range(self.height)
         ]
 
-    def draw_42(self):
+    def draw_42(self) -> None:
         """Defines and centers the '42' stencil within the maze grid."""
         # Simple drawing of a 4 and a 2
         mold_42 = {
@@ -136,16 +132,16 @@ class MazeGenerator:
         if not self.perfect:
             self._break_extra_walls()
 
-        # Open entrance and exit
-        for row, col in [self.entry, self.exit]:
-            if row == 0:
-                self.grid[row][col] &= ~1
-            elif row == self.height - 1:
-                self.grid[row][col] &= ~4
-            if col == 0:
-                self.grid[row][col] &= ~8
-            elif col == self.width - 1:
-                self.grid[row][col] &= ~2
+        # --- CORRECTED: Open entrance and exit based on (row, col) ---
+        for r, c in [self.entry, self.exit]:
+            if r == 0:                       # Top edge
+                self.grid[r][c] &= ~1
+            elif r == self.height - 1:       # Bottom edge
+                self.grid[r][c] &= ~4
+            if c == 0:                       # Left edge
+                self.grid[r][c] &= ~8
+            elif c == self.width - 1:        # Right edge
+                self.grid[r][c] &= ~2
 
     def _break_extra_walls(self) -> None:
         """Breaks random walls to create a non-perfect maze (braid maze)."""
@@ -195,22 +191,19 @@ class MazeGenerator:
         Save the maze following the strict format:
         - Hex grid (one row per line)
         - Empty line
-        - Entry coordinates
-        - Exit coordinates
+        - Entry coordinates (X,Y according to subject)
+        - Exit coordinates (X,Y according to subject)
         - Solution path
         """
         hexa = "0123456789ABCDEF"
         with open(self.output_file, "w") as f:
-            # Write the hex grid: one row per line
             for row in self.grid:
                 f.write("".join(hexa[cell] for cell in row) + "\n")
 
-            # Empty line
             f.write("\n")
 
-            # Entry coordinates (row, col) + "\n"
-            f.write(f"{self.entry[0]},{self.entry[1]}\n")
-            # Exit coordinates (row, col) + \n
-            f.write(f"{self.exit[0]},{self.exit[1]}\n")
-            # Shortest path string + \n
+            # IMPORTANT: For the output file, we swap back to (X, Y) 
+            # so it matches the subject's requirement.
+            f.write(f"{self.entry[1]},{self.entry[0]}\n")
+            f.write(f"{self.exit[1]},{self.exit[0]}\n")
             f.write(f"{solution}\n")
