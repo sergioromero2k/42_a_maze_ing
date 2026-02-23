@@ -42,11 +42,20 @@ pip install -e .
 
 ## Usage
 
-Run with the default config file:
+### Quick Start (Simplifying life with Makefile)
 
-```bash
-make run
-```
+To make your life easier, we've automated the entire setup and execution process. You don't need to worry about creating environments or installing tools manually.
+
+| Command | Action |
+|---------|--------|
+| `make venv` | **Recommended:** Creates a virtual environment and installs all dependencies. |
+| `make run` | Runs the maze generator with the default `config.txt`. |
+| `make package` | Generates the mandatory `.whl` file for submission. |
+| `make lint` | Runs `flake8` and `mypy` to ensure code quality. |
+| `make clean_venv` | Removes the virtual environment. |
+| `make fclean` | Full reset: Deletes caches, `.whl` packages, and the `venv`. |
+
+> **Pro Tip:** If it's your first time running the project, just type `make venv && source venv/bin/activate` followed by `make run`.
 
 Or point to a custom config:
 

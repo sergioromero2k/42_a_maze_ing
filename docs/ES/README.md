@@ -43,11 +43,20 @@ pip install -e .
 
 ## Uso
 
-Ejecutar con el archivo de configuración por defecto:
+### Inicio Rápido (Simplificando la vida con Makefile)
 
-```bash
-make run
-```
+Para facilitarte el trabajo, hemos automatizado todo el proceso de configuración y ejecución. No necesitas preocuparte por crear entornos ni instalar herramientas manualmente.
+
+| Comando | Acción |
+|---------|--------|
+| `make venv` | **Recomendado:** Crea un entorno virtual e instala todas las dependencias. |
+| `make run` | Ejecuta el generador de laberintos con el `config.txt` por defecto. |
+| `make package` | Genera el archivo `.whl` obligatorio para la entrega. |
+| `make lint` | Ejecuta `flake8` y `mypy` para asegurar la calidad del código. |
+| `make clean_venv` | Elimina el entorno virtual. |
+| `make fclean` | Reset completo: elimina cachés, paquetes `.whl` y el `venv`. |
+
+> **Pro Tip:** Si es la primera vez que ejecutas el proyecto, simplemente escribe `make venv && source venv/bin/activate` seguido de `make run`.
 
 O apuntando a un config personalizado:
 

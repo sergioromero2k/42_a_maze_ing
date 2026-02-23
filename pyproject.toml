@@ -12,8 +12,6 @@ authors = [
     {name = "serromer", email = "serromer@student.42madrid.com"},
     {name = "dcasado-", email = "dcasado-@student.42madrid.com"}
 ]
-
-# If you use external MLX, sometimes it is not put here, but if you use ‘numpy’ or others
 dependencies = []
 
 classifiers = [
@@ -24,6 +22,24 @@ classifiers = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["mazegen*", "display*"]
+
 [project.scripts]
-# This allows you to run ‘a-maze-ing’ from anywhere after installing it
 a-maze-ing = "a_maze_ing:main"
+
+# --- LINTERS CONFIGURATION ---
+[tool.mypy]
+# Compatible with Python 3.8+ on clusters
+python_version = "3.9"
+disallow_untyped_defs = true
+check_untyped_defs = true
+ignore_missing_imports = true
+exclude = ["venv", ".venv", "mlx_source"]
+
+[[tool.mypy.overrides]]
+# Permanently mute the mlx_source folder
+module = "mlx_source.*"
+ignore_errors = true
+
+[tool.flake8]
+exclude = ["venv", ".venv", "mlx_source", "build", "dist"]
+max-line-length = 88

@@ -199,11 +199,8 @@ class MazeGenerator:
         with open(self.output_file, "w") as f:
             for row in self.grid:
                 f.write("".join(hexa[cell] for cell in row) + "\n")
-
             f.write("\n")
-
-            # IMPORTANT: For the output file, we swap back to (X, Y) 
-            # so it matches the subject's requirement.
+            # IMPORTANT: For the output file, we swap back to (X, Y)
             f.write(f"{self.entry[1]},{self.entry[0]}\n")
             f.write(f"{self.exit[1]},{self.exit[0]}\n")
             f.write(f"{solution}\n")
