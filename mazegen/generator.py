@@ -4,6 +4,9 @@ from typing import Tuple, Optional, List
 
 
 class MazeGenerator:
+    """
+    Class responsible for generating a maze with a centered '42' pattern.
+    """
     def __init__(
         self,
         width: int,
@@ -12,56 +15,53 @@ class MazeGenerator:
         entry: Tuple[int, int],
         exit: Tuple[int, int],
         output_file: str,
-        perfect: bool
+        perfect: bool,
     ) -> None:
         """
         Initializes a maze generator with the given configuration.
 
         Args:
-            "width (int):" Number of columns in the maze grid.
-            "height (int):" Number of rows in the maze grid.
-            "seed (Optional[int]):" Random seed used to make maze generation
-                deterministic. If None, a random seed will be used.
-
-            "entry (Tuple[int, int]):" Starting cell coordinates
-                in the form (row, col).
-            "exit (Tuple[int, int]):" Ending cell coordinates
-                in the form (row, col).
-
-            "output_file (str):" Path or filename where the generated maze
-                will be saved (e.g., as an image or text representation
-                depending on implementation).
-            "perfect_maze (bool):" If True, generates a perfect maze
-                (a maze with exactly one unique path between any two cells,
-                i.e., no loops). If False, the generator may allow loops
-                or multiple paths.
+            width: Number of columns.
+            height: Number of rows.
+            seed: Optional seed for deterministic generation.
+            entry: Start coordinates as (row, col).
+            exit: End coordinates as (row, col).
+            output_file: Path to save the hex string.
+            perfect: Whether to ensure exactly one path (DFS).
         """
-        # We save the values (with their type: int)
-        self.width = width
-        self.height = height
-        self.seed = seed
-        self.entry = entry
-        self.exit = exit
-        self.output_file = output_file
-        self.perfect = perfect
+        self.width: int = width
+        self.height: int = height
+        self.seed: Optional[int] = seed
+        self.entry: Tuple[int, int] = entry
+        self.exit: Tuple[int, int] = exit
+        self.output_file: str = output_file
+        self.perfect: bool = perfect
+
+        # Attributes initialized in setup_matrices
+        self.grid: List[List[int]] = []
+        self.visited: List[List[bool]] = []
+        self.mold_positions: List[Tuple[int, int]] = []
 
         # We configure randomness with the seed.
         # Freeze randomness (deterministic generation)
         random.seed(self.seed)
         self.setup_matrices()
-        self.draw_42(entry, exit)
+        self.draw_42()
 
     def setup_matrices(self):
-        # Create the wall grid (all walls closed = 15)
+        """
+        Initializes the grid with all walls closed (15) and visit tracker.
+        """
         self.grid: list[list[int]] = [
-            [15 for _ in range(self.width)] for _ in range(self.height)]
+            [15 for _ in range(self.width)] for _ in range(self.height)
+        ]
         # Create the control matrix (everything unvisited = False)
         self.visited: list[list[bool]] = [
             [False for _ in range(self.width)] for _ in range(self.height)
         ]
 
-    def draw_42(self, entry, exit):
-        # Defines the "42" stencil (small relative coordinates)
+    def draw_42(self):
+        """Defines and centers the '42' stencil within the maze grid."""
         # Simple drawing of a 4 and a 2
         mold_42 = {
             # The number 4
@@ -94,47 +94,39 @@ class MazeGenerator:
         (the stencil spans  x=0-6 => width 7 -> 7//2 = 3, and
                             y=0-4 => height 5 -> 5//2 = 2)
         """
-        offset_x = self.width // 2 - 3
-        offset_y = self.height // 2 - 2
+        offset_row = self.height // 2 - 2
+        offset_col = self.width // 2 - 3
 
         self.mold_positions = []
         # "Paint" the 42 into the visited matrix
-        for dx, dy in mold_42:
-            x_real = offset_x + dx
-            y_real = offset_y + dy
+        for dy, dx in mold_42:
+            r_real = offset_row + dy
+            c_real = offset_col + dx
             # Only if the point falls inside the maze (safety check)
-            if 0 <= x_real < self.width and 0 <= y_real < self.height:
-                self.grid[y_real][x_real] = 15
-                self.mold_positions.append((x_real, y_real))
-
-        # Define Entry [Top-Left] and Exit (Bottom-Right)
-        self.entry = entry
-        self.exit = exit
-
-        # We mark the entry as visited so that the algorithm stats there
-        #                  coordenate[0][0]
-        self.visited[self.entry[0]][self.entry[1]] = True
+            if 0 <= r_real < self.height and 0 <= c_real < self.width:
+                self.mold_positions.append((r_real, c_real))
 
     def generate(self) -> None:
         """Generate the maze using the Recursive Backtracker (DFS) algorithm.
         The algorithm ensures that the maze is perfect (expansion tree).
         """
         stack: List[Tuple[int, int]] = []
-        start_cell: Tuple[int, int] = self.entry
-        stack.append(start_cell)
+        r_start, c_start = self.entry
+        stack.append((r_start, c_start))
+        self.visited[r_start][c_start] = True
 
         while stack:
-            cx, cy = stack[-1]
-            neighbors = self._get_unvisited_neighbors(cx, cy, self.visited)
+            cr, cc = stack[-1]
+            neighbors = self._get_unvisited_neighbors(cr, cc)
 
             if neighbors:
-                nx, ny, direction, opp_direction = random.choice(neighbors)
+                nr, nc, direction, opp_direction = random.choice(neighbors)
                 # We remove the walls (bitwise) between
                 # the current cell and the neighboring cell.
-                self.grid[cy][cx] -= direction
-                self.grid[ny][nx] -= opp_direction
-                self.visited[ny][nx] = True
-                stack.append((nx, ny))
+                self.grid[cr][cc] -= direction
+                self.grid[nr][nc] -= opp_direction
+                self.visited[nr][nc] = True
+                stack.append((nr, nc))
             else:
                 # Backtracking step:
                 # If the current cell has no unvisited neighbors,
@@ -142,8 +134,8 @@ class MazeGenerator:
                 # by popping the stack.
                 stack.pop()
 
-        for x, y in self.mold_positions:
-            self.grid[y][x] = 0
+        for r, c in self.mold_positions:
+            self.grid[r][c] = 0
         """
         Open the maze entrance and exit to the outside
         by removing the wall bit(s) that touch
@@ -154,51 +146,51 @@ class MazeGenerator:
         corresponding wall using bit by bit AND with
         the negated mask (&=~mask).
         """
-        for pos in [self.entry, self.exit]:
-            # Open entrance and exit to the outside.
-            row, column = pos
+        # Open entrance and exit to the outside.
+        for row, col in [self.entry, self.exit]:
             # Northern Border
             if row == 0:
-                self.grid[row][column] &= ~1
+                self.grid[row][col] &= ~1
                 # Southern Border
             elif row == self.height - 1:
-                self.grid[row][column] &= ~4
+                self.grid[row][col] &= ~4
             # West Border
-            if column == 0:
-                self.grid[row][column] &= ~8
+            if col == 0:
+                self.grid[row][col] &= ~8
             # East Edge
-            elif column == self.width - 1:
-                self.grid[row][column] &= ~2
+            elif col == self.width - 1:
+                self.grid[row][col] &= ~2
 
     def _get_unvisited_neighbors(
-        self, x: int, y: int, visited: List[List[bool]]
+        self, r: int, c: int
     ) -> List[Tuple[int, int, int, int]]:
-        """Searches for unvisited neighbors and
-            returns their position and wall bits.
+        """
+        Finds unvisited neighbors and calculates wall bitmasks.
 
         Returns:
-            List[Tuple[nx, ny, dir, opp_dir]]: Current direction
-                                                and its opposite.
+            List of (next_row, next_col, direction_bit, opposite_bit)
         """
         neighbors = []
-        # Addresses: (dx, dy, current_bit, opposite_bit)
+        # Directions: (dr, dc, bit, opp_bit)
         directions = [
-            (0, -1, 1, 4),  # North (1)     -> Opposite South (4)
-            (1, 0, 2, 8),   # East (2)      -> Opposite West (8)
-            (0, 1, 4, 1),   # South (4)     -> Opposite North (1)
-            (-1, 0, 8, 2)   # West (8)      -> Opposite East (2)
+            (-1, 0, 1, 4),  # North (1)     -> Opposite South (4)
+            (0, 1, 2, 8),  # East (2)      -> Opposite West (8)
+            (1, 0, 4, 1),  # South (4)     -> Opposite North (1)
+            (0, -1, 8, 2),  # West (8)      -> Opposite East (2)
         ]
 
-        for dx, dy, bit, opp_bit in directions:
-            nx, ny = x + dx, y + dy
-            if (0 <= nx < self.width
-                    and 0 <= ny < self.height
-                    and not visited[ny][nx]):
-                neighbors.append((nx, ny, bit, opp_bit))
+        for dr, dc, bit, opp_bit in directions:
+            nr, nc = r + dr, c + dc
+            if (
+                0 <= nr < self.height
+                and 0 <= nc < self.width
+                and not self.visited[nr][nc]
+            ):
+                neighbors.append((nr, nc, bit, opp_bit))
         return neighbors
 
     def save_to_file(self):
-        # Hexadecimal reference for bitwise values (0-15)
+        """Saves the grid as a hexadecimal string to the output file."""
         hexa = "0123456789abcdef"
         content = "".join(
             "".join(hexa[cell] for cell in row) for row in self.grid)

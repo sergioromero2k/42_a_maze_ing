@@ -17,17 +17,20 @@ def solve(
         str: Address string (e.g. 'EESNW').
     """
 
-    # We calculate dimensions automatically
+    # Calculate dimensions automatically
     height = len(grid)
     width = len(grid[0]) if height > 0 else 0
 
-    # Initialize Queue: (row, col, path_string)
-    # We use (row, col) to be consistent with your generator's entry/exit
-    queue: deque[Tuple[int, int, str]] = deque([(start[0], start[1], "")])
-    visited: set[Tuple[int, int]] = {start}
+    # Unpack entry and exit coordinates (row, column)
+    start_r, start_c = start
+    end_r, end_c = end
 
-    # Directions : (d_row, d_col, bit_mask, char)
-    # North: row-1 (1), East: col+1 (2), South: row+1 (4), West: col-1 (8)
+    # Queue stores: (current_row, current_col, path_string)
+    queue: deque[Tuple[int, int, str]] = deque([(start_r, start_c, "")])
+    visited: set[Tuple[int, int]] = {(start_r, start_c)}
+
+    # Directions mapping: (row_delta, col_delta, wall_bit, move_char)
+    # North (1): r-1 | East (2): c+1 | South (4): r+1 | West (8): c-1
     directions = [
         (-1, 0, 1, "N"),    # North
         (0, 1, 2, "E"),     # East
@@ -36,19 +39,20 @@ def solve(
     ]
 
     while queue:
-        r, c, path = queue.popleft()
+        row, col, path = queue.popleft()
 
-        # If we reach the exit (matching row and column).
-        if (r, c) == end:
+        # Check if target reached
+        if (row, col) == (end_r, end_c):
             return path
 
         for dr, dc, bit, char in directions:
             # New row, new column
-            nr, nc = r + dr, c + dc  
-            # nr (row) is compared to height | nc (column) is compared to width
+            nr, nc = row + dr, col + dc
+            # Check if target reached
             if 0 <= nr < height and 0 <= nc < width:
-                # VERY IMPORTANT: grid[row][column] -> grid[r][c]
-                if not (grid[r][c] & bit) and (nr, nc) not in visited:
+                # Check bitwise if the wall is open in the given direction
+                # and ensure the cell hasn't been visited yet
+                if not (grid[row][col] & bit) and (nr, nc) not in visited:
                     visited.add((nr, nc))
                     queue.append((nr, nc, path + char))
 

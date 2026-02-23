@@ -1,87 +1,88 @@
 import sys
-from mlx import Mlx
+from mlx_source import Mlx
 
 
 class MazeVisualizer:
     def __init__(self, maze):
         self.maze = maze
-        self.tile = 30
-        self.width = len(maze[0]) * self.tile
-        self.height = len(maze) * self.tile
+        self.tile = 20
+        self.rows = len(maze)
+        self.cols = len(maze[0])
 
+        # Calculamos el ancho real necesario
+        self.actual_width = self.cols * self.tile
+        self.actual_height = self.rows * self.tile
+
+        # Para evitar el "doblado", la imagen debe crearse con un ancho que MLX acepte bien.
+        # Pero la VENTANA debe medir lo que mide el laberinto.
         self.m = Mlx()
         self.ptr = self.m.mlx_init()
         self.win = self.m.mlx_new_window(
-            self.ptr, self.width, self.height, "MAZE DEBUG"
+            self.ptr, self.actual_width, self.actual_height, "Maze 42"
         )
 
-        self.img = self.m.mlx_new_image(self.ptr, self.width, self.height)
-        # IMPORTANTE: En el mlx.py que pasaste, esto devuelve un memoryview
-        self.addr, self.bpp, self.line, self.endian = self.m.mlx_get_data_addr(self.img)
+        # La imagen la creamos del tamaño exacto de la ventana
+        self.img = self.m.mlx_new_image(self.ptr, self.actual_width, self.actual_height)
+
+        # Obtenemos el size_line (self.line) que es el que manda
+        res = self.m.mlx_get_data_addr(self.img)
+        self.addr, self.bpp, self.line, self.endian = res
 
     def put_pixel(self, x, y, color):
-        if 0 <= x < self.width and 0 <= y < self.height:
-            # LA CLAVE: Usar self.line para evitar que el 42 salga "doblado"
-            offset = (y * self.line) + (x * (self.bpp // 8))
-            # Formato BGRA para la MLX de tu carpeta
-            self.addr[offset] = color & 0xFF  # Azul
-            self.addr[offset + 1] = (color >> 8) & 0xFF  # Verde
-            self.addr[offset + 2] = (color >> 16) & 0xFF  # Rojo
-            self.addr[offset + 3] = 255  # Opaco
+        # IMPORTANTE: Usar los límites reales de la ventana
+        if 0 <= x < self.actual_width and 0 <= y < self.actual_height:
+            # ESTA FÓRMULA ES LA QUE EVITA QUE SE DOBLE:
+            # y * salto_de_línea_real + x * bytes_por_píxel
+            pos = (y * self.line) + (x * 4)
 
-    def render(self, *args):
-        # 1. FORZADO: Pintar toda la pantalla de un color (ej. Azul oscuro)
-        # Esto nos dirá si la imagen se está enviando a la ventana
-        for i in range(0, len(self.addr), 4):
-            self.addr[i] = 50  # Azul
-            self.addr[i + 1] = 0  # Verde
-            self.addr[i + 2] = 0  # Rojo
-            self.addr[i + 3] = 255  # Alpha
+            try:
+                self.addr[pos] = color & 0xFF  # Blue
+                self.addr[pos + 1] = (color >> 8) & 0xFF  # Green
+                self.addr[pos + 2] = (color >> 16) & 0xFF  # Red
+                self.addr[pos + 3] = 255  # Alpha
+            except IndexError:
+                pass
 
-        # 2. Dibujar el laberinto encima
-        for y, row in enumerate(self.maze):
-            for x, val in enumerate(row):
-                self.draw_tile(x, y, val)
+    def draw_tile(self, tx, ty, val):
+        # tx es la columna (x), ty es la fila (y)
+        x0 = tx * self.tile
+        y0 = ty * self.tile
 
-        # 3. Empujar imagen
-        self.m.mlx_put_image_to_window(self.ptr, self.win, self.img, 0, 0)
+        # Fondo del 42 (Gris oscuro) o laberinto (Negro)
+        bg = 0x222222 if val == 0 else 0x000000
+        for dy in range(self.tile):
+            for dx in range(self.tile):
+                self.put_pixel(x0 + dx, y0 + dy, bg)
 
-        # 4. SINCRONIZACIÓN (Obligatoria segun tu carpeta mlx)
-        self.m.mlx_do_sync(self.ptr)
-        return 0
-
-    def draw_tile(self, x, y, val):
-        x0, y0 = x * self.tile, y * self.tile
-
-        # 1. Pintamos el FONDO de la celda primero
-        if val == 0:
-            color_fondo = 0x444444  # Un gris clarito para el "42"
-        else:
-            color_fondo = 0x000000  # Negro para los pasillos normales
-
-        for i in range(self.tile):
-            for j in range(self.tile):
-                self.put_pixel(x0 + i, y0 + j, color_fondo)
-
-        # 2. Dibujamos las paredes (Blanco puro)
-        # Solo entran aquí si val NO es 0 o si quieres paredes en el 42
+        # Paredes blancas
         w = 2
-        if val & 1:  # N
+        if val & 1:  # Norte
             for i in range(self.tile):
                 for j in range(w):
                     self.put_pixel(x0 + i, y0 + j, 0xFFFFFF)
-        if val & 2:  # E
+        if val & 2:  # Este
             for i in range(w):
                 for j in range(self.tile):
                     self.put_pixel(x0 + self.tile - 1 - i, y0 + j, 0xFFFFFF)
-        if val & 4:  # S
+        if val & 4:  # Sur
             for i in range(self.tile):
                 for j in range(w):
                     self.put_pixel(x0 + i, y0 + self.tile - 1 - j, 0xFFFFFF)
-        if val & 8:  # W
+        if val & 8:  # Oeste
             for i in range(w):
                 for j in range(self.tile):
                     self.put_pixel(x0 + i, y0 + j, 0xFFFFFF)
+
+    def render(self, *args):
+        # Recorremos la matriz: maze[fila][columna]
+        for y in range(self.rows):
+            for x in range(self.cols):
+                # Dibujamos en (x, y) el valor de maze[y][x]
+                self.draw_tile(x, y, self.maze[y][x])
+
+        self.m.mlx_put_image_to_window(self.ptr, self.win, self.img, 0, 0)
+        self.m.mlx_do_sync(self.ptr)
+        return 0
 
     def run(self):
         self.m.mlx_key_hook(

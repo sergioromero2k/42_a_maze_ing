@@ -1,4 +1,4 @@
-from mlx import Mlx
+from mlx_source import Mlx
 
 
 def main() -> None:
