@@ -170,9 +170,8 @@ The project is split into two independent packages:
 │       ├── mlx.3
 │       ├── mlx.h
 │       └── ... (other .3 files)
-├── tests/                 # Unit tests for logic and window
-│   ├── test_logic.py
-│   └── test_window.py
+├── tests/                 # Unit tests for logic
+│   ├── __init__.py_
 └── .gitignore             # File to prevent tracking caches/garbage
 ```
 

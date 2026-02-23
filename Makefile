@@ -80,8 +80,6 @@ re: clean run
 
 # --- Linting (Code Quality) ---
 
-# --- Linting (Code Quality) ---
-
 lint:
 	@echo "$(YELLOW)Running Flake8...$(RESET)"
 	-$(PYTHON) -m flake8 . --exclude=venv,test_env,env,.venv,mlx_source,mlx

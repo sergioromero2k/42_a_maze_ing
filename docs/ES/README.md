@@ -171,9 +171,8 @@ El proyecto está dividido en dos paquetes independientes:
 │       ├── mlx.3
 │       ├── mlx.h
 │       └── ... (otros archivos .3)
-├── tests/                 # Tests unitarios de lógica y ventana
-│   ├── test_logic.py
-│   └── test_window.py
+├── tests/                 # Pruebas unicas
+│   ├── __init__.py_
 └── .gitignore             # Evita el seguimiento de cachés y archivos temporales
 ```
 
