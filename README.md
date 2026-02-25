@@ -181,8 +181,8 @@ The project is split into two independent packages:
 
 | Member | Role |
 |--------|------|
-| **serromer** | Lead Architect — MazeGenerator engine, DFS logic, Python packaging, Makefile |
-| **dcasado-** | Lead Developer — BFS Solver, config parser, MiniLibX graphical interface |
+| **serromer** | Lead Architect, Developer — MazeGenerator engine, config parser, MiniLibX graphical interface, Python packaging, Makefile |
+| **dcasado-** | Lead Developer — BFS Solver, DFS logic |
 
 ### Planning vs. Reality
 
