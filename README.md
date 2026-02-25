@@ -3,7 +3,7 @@
 # 42_A_MAZE_ING — The Perfect Maze Generator
 ---
 
-## What is this?
+## Description
 
 **A-Maze-ing** is a Python suite for generating and solving **perfect mazes** — mazes where any two points are connected by exactly one path, with no loops and no unreachable areas (a spanning tree, in graph theory terms).
 
