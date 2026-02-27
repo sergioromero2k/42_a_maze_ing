@@ -11,12 +11,12 @@ starting with '#' and empty lines.
 
 
 class ConfigError(Exception):
-    # Custom exception for configuration errors
+    """Custom exception for configuration errors"""
     pass
 
 
 def get_raw_config(file_path: str) -> Dict[str, str]:
-    # Reads the configuration file and returns a dictionary of strings.
+    """Reads the configuration file and returns a dictionary of strings."""
     raw_data = {}
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -43,7 +43,8 @@ def get_raw_config(file_path: str) -> Dict[str, str]:
 
 
 def format_value(key: str, value: str) -> Any:
-    # Converts a string value to the appropriate Python type based on the key.
+    """Converts a string value to the appropriate
+    Python type based on the key."""
     try:
         value = value.replace("'", "").replace('"', "")
 
@@ -71,7 +72,7 @@ def format_value(key: str, value: str) -> Any:
 
 
 def format_config(raw_data: Dict[str, str]) -> Dict[str, Any]:
-    # Receives the string dictionary and returns the correct types.
+    """Receives the string dictionary and returns the correct types."""
     return {
         key.lower(): format_value(key, value)
         for key, value in raw_data.items()}
@@ -86,7 +87,7 @@ def validate_logic(config: Dict[str, Any]) -> bool:
     if not width or not height:
         raise ConfigError("Config.txt is missing WIDTH or HEIGHT")
 
-    # Validamos usando la lógica interna de tu programa (y < height, x < width)
+    # We validate using your program's internal logic (and < height, x < width)
     if not (0 <= entry[0] < height) or not (0 <= entry[1] < width):
         raise ConfigError(
             f"Entry {entry} out of bounds for {height}x{width}")
@@ -99,7 +100,7 @@ def validate_logic(config: Dict[str, Any]) -> bool:
 
 
 def parse_config(file_path: str) -> Dict[str, Any]:
-    # Main funciton that coordinates reading and formatting.
+    """Main funciton that coordinates reading and formatting."""
     raw = get_raw_config(file_path)
     raw_data = format_config(raw)
     try:

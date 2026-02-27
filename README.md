@@ -3,7 +3,7 @@
 # 42_A_MAZE_ING — The Perfect Maze Generator
 ---
 
-## What is this?
+## Description
 
 **A-Maze-ing** is a Python suite for generating and solving **perfect mazes** — mazes where any two points are connected by exactly one path, with no loops and no unreachable areas (a spanning tree, in graph theory terms).
 
@@ -181,7 +181,7 @@ The project is split into two independent packages:
 
 | Member | Role |
 |--------|------|
-| **serromer** | Lead Architect, Developer — MazeGenerator engine, config parser, MiniLibX graphical interface, Python packaging, Makefile |
+| **serromer** | Lead Architect, Developer — MazeGenerator engine, config parser, BFS Solver, DFS logic, MiniLibX graphical interface, Python packaging, Makefile|
 | **dcasado-** | Lead Developer — BFS Solver, DFS logic |
 
 ### Planning vs. Reality

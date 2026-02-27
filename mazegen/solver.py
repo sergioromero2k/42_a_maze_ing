@@ -28,6 +28,7 @@ def solve(
     end_r, end_c = end
 
     # Queue stores: (current_row, current_col, path_string)
+    # Positions I have yet to explore
     queue: deque[Tuple[int, int, str]] = deque([(start_r, start_c, "")])
     visited: set[Tuple[int, int]] = {(start_r, start_c)}
 
